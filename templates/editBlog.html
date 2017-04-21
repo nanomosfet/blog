@@ -1,0 +1,26 @@
+<form method="post">
+    <label>
+        <div>Subject</div>
+        <input type="text" name="subject" value="{{blog.subject}}">
+    </label>
+
+    <label>
+        <div>Content</div>
+        <textarea name="content">{{blog.content}}</textarea>
+    </label>
+    <div>
+        <input type="submit" value="Edit">
+    </div>
+    
+</form>
+<form method="post">
+	<div>
+        <input type="submit" name="delete" value="Delete">
+    </div>
+</form>
+<form method="post">
+	<div>
+        <input type="submit" name="cancel" value="Cancel">
+    </div>
+</form>
+<div class="error">{{error}}</div> 

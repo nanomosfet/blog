@@ -1,0 +1,19 @@
+<script src="js/blog.js"></script>
+{% for blog in blogs %}
+    <div class="blogs">
+        <a href="/{{blog.key().id()}}">{{blog.subject}}</a>
+        <div class="blog-title">Created by: {{blog.created_by}}</div>
+        <pre class="blog-body">{{blog.content}}</pre>
+        <button type="button" id="like-{{loop.index}}" onclick="likeRequest({{loop.index}},{{blog.key().id()}})">
+        {%- if likes_for_page[loop.index - 1] -%}
+        	Unlike
+        {%- else -%}
+        	Like
+       	{%- endif %}	       		
+       	</button>
+       	<p id="num_likes-{{loop.index}}">&#128077; {{blog.num_likes}}</p>       
+        <div id="error-{{loop.index}}"></div>       
+        <hr>
+    </div>
+    
+{% endfor %}
