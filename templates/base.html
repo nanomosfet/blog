@@ -2,12 +2,37 @@
 
 <html>
 	<head>
-		<title> Udacity Tutorial</title>
+		<title>BlogFire</title>
+		<script src="js/blog.js"></script>
 	</head>
 
 	<body>
-		<h1> Udacity Templates</h1>
-		{% block content %}
+		<header>
+			<h1>BlogFire</h1>
+			<p>Signed in as {{user}}</p>
+			<nav id="drawer" class="nav">
+				<ul class="nav__list">
+					<li class="nav__item">
+						<a href="/">Home</a>
+					</li>					
+					</li>
+					{% if not user %}
+					<li class="nav__item">
+						<a href="/signup">Signup</a>
+					</li>
+					
+					<li class="nav__item">
+						<a href="/login">Login</a>
+					</li>
+					{% else %}
+					<li class="nav__item">
+						<a href="/newpost">New Blog</a>
+					<li class="nav__item">
+						<a href="/logout">Logout</a>
+					</li>
+					{% endif%}
+				</ul>
+			</nav>
+		</header>
+		{% block main_content %}
 		{% endblock %}
-	</body>
-</html>

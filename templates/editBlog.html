@@ -1,3 +1,7 @@
+{% include "base.html" %}
+
+{% block main_content %}
+
 <form method="post">
     <label>
         <div>Subject</div>
@@ -23,4 +27,6 @@
         <input type="submit" name="cancel" value="Cancel">
     </div>
 </form>
-<div class="error">{{error}}</div> 
+<div class="error">{{error}}</div>
+{% endblock %}
+{% include "footer.html" %}

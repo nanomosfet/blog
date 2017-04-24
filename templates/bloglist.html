@@ -1,19 +1,27 @@
+{% include "base.html" %}
+{% block main_content %}
 <script src="js/blog.js"></script>
+<article id="blog-list">
 {% for blog in blogs %}
-    <div class="blogs">
-        <a href="/{{blog.key().id()}}">{{blog.subject}}</a>
+    
+        <a href="/{{blog.key.id()}}">{{blog.subject}}</a>
         <div class="blog-title">Created by: {{blog.created_by}}</div>
         <pre class="blog-body">{{blog.content}}</pre>
-        <button type="button" id="like-{{loop.index}}" onclick="likeRequest({{loop.index}},{{blog.key().id()}})">
+        {% if blog.image %}
+        <img id="blog-img" src="/img?img_id={{blog.key.id()}}">
+        {% endif %}
+        <button type="button" id="like-{{loop.index}}" onclick="likeRequest({{loop.index}},{{blog.key.id()}})">
         {%- if likes_for_page[loop.index - 1] -%}
         	Unlike
         {%- else -%}
         	Like
        	{%- endif %}	       		
        	</button>
-       	<p id="num_likes-{{loop.index}}">&#128077; {{blog.num_likes}}</p>       
-        <div id="error-{{loop.index}}"></div>       
+       	<p id="num_likes-{{loop.index}}">&#128077; {{blog.num_likes}}</p>
+       	<a href="/{{blog.key.id()}}"id="num_comments"> Comments[{{blog.num_comments}}]</a>
+        <div id="error-{{loop.index}}"></div>
         <hr>
-    </div>
-    
 {% endfor %}
+ </article>
+{% endblock %}
+{% include "footer.html" %}
