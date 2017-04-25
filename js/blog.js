@@ -143,20 +143,27 @@ function toggle_edit_comment(comment_id, comment_content) {
 	var submit_button = document.getElementById("submit-comment");
 	var cancel_button = document.createElement("button");
 	var edit_button = document.getElementById("edit-comment-" + comment_id);
+	var old_submit_onclick = submit_button.onclick
 	if (edit_comment_mode == true) {
 		return 0;
 	}
 	cancel_text = document.createTextNode("Cancel")
 	cancel_button.appendChild(cancel_text);
 	submit_button.insertAdjacentElement("afterend", cancel_button);
-	var old_submit_onclick = submit_button.onclick
+	console.log("In toggle_edit_comment: " + comment_id);
 	comment_area.value = comment_content;
 	submit_button.onclick = function() {
 		comment_content = comment_area.value;
-		console.log("In toggle_edit_comment: " + comment_id);
+		
 		update_comment(comment_id, comment_content);
 		cancel_button.parentNode.removeChild(cancel_button);
 		submit_button.onclick = old_submit_onclick;
+		edit_button.onclick = function() {
+			toggle_edit_comment(comment_id,comment_content);
+		}
+
+		//comment_area.value = "";
+
 		edit_comment_mode = false;
 
 	};
@@ -168,6 +175,7 @@ function toggle_edit_comment(comment_id, comment_content) {
 		comment_area.value = "";
 		submit_button.onclick = old_submit_onclick;
 		cancel_button.parentNode.removeChild(cancel_button);
+		
 		edit_comment_mode = false;
 
 	};
@@ -189,12 +197,13 @@ function update_comment(comment_id, comment_content) {
 			if(json_obj.ret_val == true) {
 				comment_area.value = "";
 				comment = document.getElementById("comment-" + json_obj.comment_id).firstChild.nextSibling;
+				
 				comment.innerHTML = json_obj.user + ": " + json_obj.comment_content;
 				
 				// edit_button.onclick = function() {
 				// 	console.log("In update: " + json_obj.comment_id);
 				// 	toggle_edit_comment(json_obj.comment_id, json_obj.comment_content);
-				// };
+				// }
 
 			}
 			error_element.innerHTML = json_obj.error;
@@ -215,11 +224,19 @@ function upload_image(blog_id) {
 	var http_request = new XMLHttpRequest();
 	var img_upload_element = document.getElementById("img");
 	var formData = new FormData();
+	var img_element = document.getElementById("blog-img");
+	var blog_body = document.getElementById("blog-body");
+	var delete_image_button = document.createElement("button");
+	var t = document.createTextNode("Delete Photo")
+	delete_image_button.appendChild(t);
+	delete_image_button.id = "delete-img";
+	delete_image_button.onclick = function() {
+		delete_image(blog_id);
+	};
 
 	formData.append("blog_id", blog_id);
 	formData.append("img", img_upload_element.files[0]);
-	var img_element = document.getElementById("blog-img");
-	var blog_body = document.getElementById("blog-body")
+	
 
 
 	http_request.onreadystatechange = function() {
@@ -231,6 +248,7 @@ function upload_image(blog_id) {
 				img_element.id = "blog-img";
 				img_element.src = "/img?img_id="+String(blog_id) +"&n=" + rand_num;
 				blog_body.append(img_element);
+				blog_body.append(delete_image_button);
 			} else {				
 				img_element.src = "/img?img_id="+String(blog_id) +"&n=" + rand_num;
 			}
@@ -247,9 +265,11 @@ function upload_image(blog_id) {
 
 function delete_image(blog_id) {
 		var i = document.getElementById("blog-img");
+		var d = document.getElementById("delete-img");
 		var http_request = new XMLHttpRequest();
 		var form = new FormData();
 		i.parentNode.removeChild(i);
+		d.parentNode.removeChild(d);
 		http_request.onreadystatechange = function() {
 			if (this.readyState == 4 && self.status == 200) {
 				

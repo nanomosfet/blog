@@ -9,11 +9,12 @@
 		<p class="created_by">Created by: {{blog.created_by}}</p>
 		{% if user == blog.created_by %}
 		<input type="file" id="img" onchange="upload_image({{blog.key.id()}})">
-		<button onclick="delete_image({{blog.key.id()}})">Delete Image</button>
+		
 		{% endif %}
 		<br>
 		{% if blog.image %}
 		<img id="blog-img" src="/img?img_id={{blog.key.id()}}">
+		<button id="delete-img" onclick="delete_image({{blog.key.id()}})">Delete Image</button>
 		{% endif %}
 
 		{% if user == blog.created_by %}
