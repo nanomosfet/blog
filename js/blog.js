@@ -154,7 +154,7 @@ function toggle_edit_comment(comment_id, comment_content) {
 	comment_area.value = comment_content;
 	submit_button.onclick = function() {
 		comment_content = comment_area.value;
-		
+
 		update_comment(comment_id, comment_content);
 		cancel_button.parentNode.removeChild(cancel_button);
 		submit_button.onclick = old_submit_onclick;
@@ -175,7 +175,7 @@ function toggle_edit_comment(comment_id, comment_content) {
 		comment_area.value = "";
 		submit_button.onclick = old_submit_onclick;
 		cancel_button.parentNode.removeChild(cancel_button);
-		
+
 		edit_comment_mode = false;
 
 	};
@@ -197,9 +197,9 @@ function update_comment(comment_id, comment_content) {
 			if(json_obj.ret_val == true) {
 				comment_area.value = "";
 				comment = document.getElementById("comment-" + json_obj.comment_id).firstChild.nextSibling;
-				
+
 				comment.innerHTML = json_obj.user + ": " + json_obj.comment_content;
-				
+
 				// edit_button.onclick = function() {
 				// 	console.log("In update: " + json_obj.comment_id);
 				// 	toggle_edit_comment(json_obj.comment_id, json_obj.comment_content);
@@ -236,11 +236,11 @@ function upload_image(blog_id) {
 
 	formData.append("blog_id", blog_id);
 	formData.append("img", img_upload_element.files[0]);
-	
+
 
 
 	http_request.onreadystatechange = function() {
-		
+
 		if (this.readyState == 4 && this.status == 200) {
 			var rand_num = Math.floor((Math.random()*10000) + 1)
 			if (img_element == null) {
@@ -249,7 +249,7 @@ function upload_image(blog_id) {
 				img_element.src = "/img?img_id="+String(blog_id) +"&n=" + rand_num;
 				blog_body.append(img_element);
 				blog_body.append(delete_image_button);
-			} else {				
+			} else {
 				img_element.src = "/img?img_id="+String(blog_id) +"&n=" + rand_num;
 			}
 		}
@@ -259,26 +259,53 @@ function upload_image(blog_id) {
 	http_request.open("POST", "/images", true);
 	//http_request.setRequestHeader("Content-type", "multipart/form-data");
 	console.log(formData)
-	http_request.send(formData);
 
+	img_upload_element.value = "";
+
+	progress_bar = document.createElement("PROGRESS");
+	progress_bar.value = 0;
+	progress_bar.max = 100;
+
+	display = document.createElement("span");
+
+	img_upload_element.insertAdjacentElement("afterend", progress_bar);
+	img_upload_element.insertAdjacentElement("afterend", display);
+
+
+	if (http_request.upload) {
+		http_request.upload.onprogress = function(e) {
+			if(e.lengthComputable) {
+				progress_bar.max = e.total;
+				progress_bar.value = e.loaded;
+				display.innerText = Math.floor((e.loaded / e.total) * 100) + "%";
+			}
+		};
+	}
+
+	http_request.onloadstart = function(e) {
+    progress_bar.value = 0;
+	};
+	http_request.onloadend = function(e) {
+    progress_bar.value = e.loaded;
+    progress_bar.parentNode.removeChild(progress_bar);
+    display.parentNode.removeChild(display);
+	};
+
+	http_request.send(formData);
+	//progress_bar.parentNode.removeChild(progress_bar);
 }
 
 function delete_image(blog_id) {
-		var i = document.getElementById("blog-img");
-		var d = document.getElementById("delete-img");
-		var http_request = new XMLHttpRequest();
-		var form = new FormData();
-		i.parentNode.removeChild(i);
-		d.parentNode.removeChild(d);
-		http_request.onreadystatechange = function() {
-			if (this.readyState == 4 && self.status == 200) {
-				
-			}
-		};
-		
-		form.append("delete_image", true);
-		form.append("blog_id", blog_id);
+	var i = document.getElementById("blog-img");
+	var d = document.getElementById("delete-img");
+	var http_request = new XMLHttpRequest();
+	var form = new FormData();
+	i.parentNode.removeChild(i);
+	d.parentNode.removeChild(d);
 
-		http_request.open("POST", "/images");
-		http_request.send(form);
-	}
+	form.append("delete_image", true);
+	form.append("blog_id", blog_id);
+
+	http_request.open("POST", "/images");
+	http_request.send(form);
+}

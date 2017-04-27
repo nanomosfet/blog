@@ -9,12 +9,13 @@
 		<p class="created_by">Created by: {{blog.created_by}}</p>
 		{% if user == blog.created_by %}
 		<input type="file" id="img" onchange="upload_image({{blog.key.id()}})">
-		
 		{% endif %}
 		<br>
 		{% if blog.image %}
 		<img id="blog-img" src="/img?img_id={{blog.key.id()}}">
+		{% if user == blog.created_by %}
 		<button id="delete-img" onclick="delete_image({{blog.key.id()}})">Delete Image</button>
+		{% endif %}
 		{% endif %}
 
 		{% if user == blog.created_by %}
@@ -24,8 +25,9 @@
 		        <input type="submit" name="edit_blog" value="Edit Blog">
 		    </div>
 		</form>
+		{% endif %}
 	</article>
-	{% endif %}
+
 	<article id="comments">
 		<section id="existing-comments">
 			{% for comment in comments %}
