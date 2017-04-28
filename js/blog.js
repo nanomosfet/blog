@@ -1,3 +1,11 @@
+// Nav JS
+var drawer = document.getElementById("drawer");
+var menu = document.getElementById("menu");
+
+menu.addEventListener('click', function(e) {
+	drawer.classList.toggle('open');
+	e.stopPropagation();
+});
 
 function likeRequest(loop, blog_id) {
 	var http_request = new XMLHttpRequest();

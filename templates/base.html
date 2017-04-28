@@ -3,36 +3,45 @@
 <html>
 	<head>
 		<title>Blogfat</title>
-		<script src="js/blog.js"></script>
+		<meta charset="utf-8">
+	    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+	    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	    <title>Lenys Portfolio</title>
+	    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500" rel="stylesheet" type="text/css">
+		<link rel="stylesheet" type="text/css" href="css/blog.css">
 	</head>
 
 	<body>
 		<header>
-			<h1>Blogfat</h1>
-			<p>Signed in as {{user}}</p>
-			<nav id="drawer" class="nav">
-				<ul class="nav__list">
-					<li class="nav__item">
-						<a href="/">Home</a>
-					</li>					
-					</li>
-					{% if not user %}
-					<li class="nav__item">
-						<a href="/signup">Signup</a>
-					</li>
-					
-					<li class="nav__item">
-						<a href="/login">Login</a>
-					</li>
-					{% else %}
-					<li class="nav__item">
-						<a href="/newpost">New Blog</a>
-					<li class="nav__item">
-						<a href="/logout">Logout</a>
-					</li>
-					{% endif%}
-				</ul>
-			</nav>
+
+			<a id="menu">&#9776;</a>
 		</header>
+		<nav id="drawer" class="nav">
+			<ul class="nav__list">
+				
+				<li class="nav__item">
+					<a href="/">Home</a>
+				</li>
+				</li>
+				{% if not user %}
+				<li class="nav__item">
+					<a href="/signup">Sign Up</a>
+				</li>
+				<li class="nav__item">
+					<a href="/login">Login</a>
+				</li>
+				{% else %}
+				<li class="nav__item">
+					<a href="/newpost">New Post</a>
+				<li class="nav__item">
+					<a href="/logout">Logout</a>
+				</li>
+				<li class="nav__item">
+					<p>Signed in as {{user}}</p>
+				</li>
+				{% endif%}
+			</ul>
+			<
+		</nav>
 		{% block main_content %}
 		{% endblock %}
