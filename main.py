@@ -38,7 +38,7 @@ class Handler(webapp2.RequestHandler):
 		if user_cookie:
 			user = cookieStuff.check_secure_val(user_cookie)
 		if not user and redirect:
-			self.redirect("/signup")
+			self.redirect("/login")
 		return user
 
 
@@ -47,7 +47,7 @@ class imageHandler(Handler):
 		delete_image = self.request.get('delete_image')
 		blog_id = self.request.get('blog_id')
 		image = self.request.get('img')
-		
+
 		blog = Blogs.get_by_id(int(blog_id))
 
 
@@ -76,7 +76,9 @@ class Image(Handler):
 
 class signupHandler(Handler):
 	def get(self):
-		self.render('signup.html', user = False)
+		self.render('signup.html',
+		user = False,
+		page_title = "Sign Up")
 	def post(self):
 		#self.response.headers['Content-Type'] = 'text/plain'
 		username= self.request.get('username')
@@ -119,9 +121,14 @@ class signupHandler(Handler):
 				str('user_id=%s; Path=/' % value))
 			self.redirect("/welcome")
 
-		self.render("signup.html", userError = userError,
-					passError = passError, emailError = emailError,
-					verifyError = verifyError, user = False)
+		self.render(
+			"signup.html",
+			userError = userError,
+			passError = passError,
+			emailError = emailError,
+			verifyError = verifyError,
+			user = False,
+			page_title = "Sign Up")
 
 class Blogs(db.Model):
 	subject = db.StringProperty(required = True)
@@ -173,7 +180,13 @@ class Comments(db.Model):
 
 class bloglistHandler(Handler):
 	def get(self):
-		blogs = Blogs.query().order(-Blogs.created)
+		user_id = self.request.get('user_id')
+		if user_id:
+			blogs = Blogs.query()
+			blogs = blogs.filter(Blogs.created_by == user_id)
+			blogs = blogs.order(-Blogs.created)
+		else:
+			blogs = Blogs.query().order(-Blogs.created)
 		user = self.user_set(False)
 		likes_for_page = Likes.generate_likes_list(user,blogs)
 		error = ''
@@ -183,7 +196,8 @@ class bloglistHandler(Handler):
 			likes_for_page = likes_for_page,
 			error = error,
 			liked_idx = 0,
-			user = user)
+			user = user,
+			page_title = 'Latest Blogs')
 
 	def post(self):
 		blogs = Blogs.query().order(-Blogs.created)
@@ -213,7 +227,8 @@ class bloglistHandler(Handler):
 			 blogs = blogs,
 			 error = error,
 			 likes_for_page = likes_for_page,
-			 liked_idx = int(liked_idx))
+			 liked_idx = int(liked_idx),
+			 page_title = 'Latest Blogs')
 		self.render(
 			'base.html',
 			user = user)
@@ -227,7 +242,8 @@ class blogHandler(Handler):
 			'blog.html',
 			blog = blog,
 			user = user,
-			comments = comments)
+			comments = comments,
+			page_title = blog.subject)
 	def post(self, blogID):
 		blog = Blogs.get_by_id(int(blogID))
 		subject = self.request.get('subject')
@@ -262,7 +278,8 @@ class blogHandler(Handler):
 			'editBlog.html',
 			user = user,
 			blog = blog,
-			error = error
+			error = error,
+			page_title = blog.subject
 			)
 
 class newpostHandler(Handler):
@@ -273,7 +290,8 @@ class newpostHandler(Handler):
 			error = '',
 			subject = '',
 			content = '',
-			user = user)
+			user = user,
+			page_title = 'New Post')
 
 	def post(self):
 		user = self.user_set()
@@ -296,17 +314,21 @@ class newpostHandler(Handler):
 				subject = subject,
 				content = content,
 				error = error,
-				user = user)
+				user = user,
+				page_title = 'New Post')
 
 class welcomeHandler(Handler):
 	def get(self):
 		user = self.user_set()
-		self.render("welcome.html",user = user)
+		self.redirect("/newpost")
 
 
 class loginHandler(Handler):
 	def get(self):
-		self.render("login.html", loginError = "")
+		self.render(
+			"login.html",
+			loginError = "",
+			page_title = "Log In")
 	def post(self):
 		username = self.request.get('username')
 		password = self.request.get('password')
@@ -318,14 +340,17 @@ class loginHandler(Handler):
 			self.redirect("/welcome")
 		else:
 			loginError = "Incorrect Login"
-			self.render("login.html", loginError = loginError)
+			self.render(
+				"login.html",
+				loginError = loginError,
+				page_title = "Log In")
 
 class logoutHandler(Handler):
 	def get(self):
 		self.response.headers.add_header(
 			'Set-Cookie',
 			str('user_id=; Path=/'))
-		self.redirect("/signup")
+		self.redirect("/login")
 
 
 class Valid():

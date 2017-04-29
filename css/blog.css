@@ -1,7 +1,7 @@
 
 body {
   font-family: Roboto;
-  font-size: 12px;
+  font-size: .8em;
   color: #424242;
 }
 
@@ -9,11 +9,30 @@ h1, h2, h3, h4, p {
     margin: 0px;
 }
 
+.page-title {
+  padding-bottom: 0.5em;
+}
+
+a:visited {
+  text-decoration: none;
+  color: #008cba;
+}
+
+
+a:active {
+  color: #00A949;
+}
+
+header {
+  width: 100%;
+  border-bottom: thin groove;
+  padding-bottom: .1em;
+}
 
 
 img {
     max-width: 100%;
-    max-height: 200px;
+    max-height: 325px;
     width:auto;
     height: auto;
     margin: auto;
@@ -21,6 +40,56 @@ img {
 }
 
 
+
+.button:hover {
+  background-color: #808CBA;
+
+}
+
+.button:focus {
+  text-decoration: none;
+  outline: none;
+}
+
+/*Forms*/
+input[type=text], input[type=password], textarea, select {
+    width: 100%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    display: inline-block;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+textarea {
+  min-height: 300px;
+}
+
+
+#new-comment {
+  min-height: 100px;
+}
+
+p, pre{
+  font-size: 1em;
+}
+
+
+input[type=submit], .button {
+    width: 100%;
+    background-color: #008CBA;
+    color: white;
+    padding: 14px 20px;
+    margin: 8px 0;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+input[type=submit]:hover {
+    background-color: #808CBA;
+}
 /*
  *
  * Top Level Navigation
@@ -71,7 +140,7 @@ nav p {
   white-space: nowrap;
 }
 
-p {
+p, pre {
   white-space: pre-wrap;
 }
 
@@ -103,12 +172,12 @@ p {
     border-radius: 25px;
   }
 
-  #menu {
+.menu {
   position:fixed;
   top:5px;
   right:5px;
   z-index: 2;
-  font-size: small;
+  font-size: medium;
   font-weight: bold;
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
   background-color: white;
@@ -116,8 +185,16 @@ p {
   padding: 0.50em;
 }
 
+#back {
+  top:5px;
+  right: 50px;
+
+}
+
 .blog {
-  width: 100%
+  width: 100%;
+  border-bottom: thin groove;
+  padding-bottom: .1em;
 }
 
 .blog-subject {
@@ -128,6 +205,17 @@ p {
   padding: .5em;
   text-align: center;
 }
+
+.blog-user {
+  padding: 5px;
+}
+
+.blog-body {
+  font-size: 1.2em;
+}
+
+
+
 
 
 

@@ -1,32 +1,33 @@
 {% include "base.html" %}
 
 {% block main_content %}
+<content class="forms">
+    <form method="post">
 
-<form method="post">
-    
-    <label>Username
-        <input type="text" name="username">
-    </label>
-    <label>Password
-        <input type="password" name="password">
-    </label>
-    <label>Verify Password
-        <input type="password" name="verify">
-    </label>
-    <label>Email
-        <input type="text" name="email">
-    </label>
-    <br>
-    {{ userError }}
-    <br>
-    {{ passError }}
-    <br>
-    {{ emailError }}
-    <br>
-    {{ verifyError }}
-    
-    <input type="submit">
-</form>
+        <label>Username
+            <input type="text" name="username">
+        </label>
+        <label>Password
+            <input type="password" name="password">
+        </label>
+        <label>Verify Password
+            <input type="password" name="verify">
+        </label>
+        <label>Email
+            <input type="text" name="email">
+        </label>
+        <br>
+        {{ userError }}
+        <br>
+        {{ passError }}
+        <br>
+        {{ emailError }}
+        <br>
+        {{ verifyError }}
+
+        <input type="submit">
+    </form>
+</content>
 
 {% endblock %}
 {% include "footer.html" %}

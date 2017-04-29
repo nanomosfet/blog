@@ -2,10 +2,15 @@
 var drawer = document.getElementById("drawer");
 var menu = document.getElementById("menu");
 
+
+
+
 menu.addEventListener('click', function(e) {
 	drawer.classList.toggle('open');
 	e.stopPropagation();
 });
+
+
 
 function likeRequest(loop, blog_id) {
 	var http_request = new XMLHttpRequest();
@@ -82,11 +87,14 @@ function commentRequest(blog_id) {
 				var d = document.createElement("div");
 				var c = document.createTextNode(json_obj.user + ": " + new_comment);
 				var hr = document.createElement("hr");
-				var p = document.createElement("pre");
+				var p = document.createElement("p");
 				var b = document.createElement("button");
 				var t = document.createTextNode("Delete Comment");
 				var e = document.createElement("button")
 				var t_e = document.createTextNode("Edit")
+				p.className = "blog-body"
+				e.className = "button";
+				b.className = "button";
 				e.id = "edit-comment-" + json_obj.comment_id;
 				e.appendChild(t_e);
 				console.log("In commentRequest: " + json_obj.comment_id);
@@ -120,13 +128,17 @@ function commentRequest(blog_id) {
 	console.log(form);
 	http_request.send(form);
 }
-
+var edit_comment_mode = false;
 function delete_comment(comment_id, blog_id) {
 	var http_request = new XMLHttpRequest();
 	var id = "comment_id=" + comment_id;
 	var delete_comment = "delete_comment=true"
 	var blog_id = "blog_id=" + blog_id;
 	var comment_element = document.getElementById("comment-" + comment_id)
+
+	if (edit_comment_mode == true) {
+		return 0;
+	}
 
 	var params = id + "&" + delete_comment + "&" + blog_id;
 	http_request.onreadystatechange = function() {
@@ -144,18 +156,25 @@ function delete_comment(comment_id, blog_id) {
 
 
 
-var edit_comment_mode = false;
+
 
 function toggle_edit_comment(comment_id, comment_content) {
 	var comment_area = document.getElementById("new-comment");
 	var submit_button = document.getElementById("submit-comment");
 	var cancel_button = document.createElement("button");
 	var edit_button = document.getElementById("edit-comment-" + comment_id);
-	var old_submit_onclick = submit_button.onclick
+	var add_comments_section = document.getElementById("add-comments");
+	var comments_section = document.getElementById("comments");
+	var old_submit_onclick = submit_button.onclick;
 	if (edit_comment_mode == true) {
 		return 0;
 	}
+
+	edit_button.insertAdjacentElement('afterend', add_comments_section);
+
+
 	cancel_text = document.createTextNode("Cancel")
+	cancel_button.classList += "button";
 	cancel_button.appendChild(cancel_text);
 	submit_button.insertAdjacentElement("afterend", cancel_button);
 	console.log("In toggle_edit_comment: " + comment_id);
@@ -168,10 +187,9 @@ function toggle_edit_comment(comment_id, comment_content) {
 		submit_button.onclick = old_submit_onclick;
 		edit_button.onclick = function() {
 			toggle_edit_comment(comment_id,comment_content);
+
 		}
-
-		//comment_area.value = "";
-
+		comments_section.appendChild(add_comments_section);
 		edit_comment_mode = false;
 
 	};
@@ -183,7 +201,7 @@ function toggle_edit_comment(comment_id, comment_content) {
 		comment_area.value = "";
 		submit_button.onclick = old_submit_onclick;
 		cancel_button.parentNode.removeChild(cancel_button);
-
+		comments_section.appendChild(add_comments_section);
 		edit_comment_mode = false;
 
 	};
@@ -255,8 +273,9 @@ function upload_image(blog_id) {
 				img_element = document.createElement("img");
 				img_element.id = "blog-img";
 				img_element.src = "/img?img_id="+String(blog_id) +"&n=" + rand_num;
-				blog_body.append(img_element);
-				blog_body.append(delete_image_button);
+				blog_body.appendChild(img_element);
+				blog_body.appendChild(delete_image_button);
+				delete_image_button.classList = "button";
 			} else {
 				img_element.src = "/img?img_id="+String(blog_id) +"&n=" + rand_num;
 			}
@@ -317,3 +336,4 @@ function delete_image(blog_id) {
 	http_request.open("POST", "/images");
 	http_request.send(form);
 }
+

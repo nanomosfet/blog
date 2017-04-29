@@ -4,17 +4,21 @@
 <content id="blog" class="main-content">
 	<article id="blog-body">
 		<h4 class="subject">{{blog.subject}}</h4>
-		<p class="content">{{blog.content}}</p>
+		<p class="blog-body">{{blog.content}}</p>
 		<p class="created_by">Created by: {{blog.created_by}}</p>
-		{% if user == blog.created_by %}
-		<input type="file" id="img" onchange="upload_image({{blog.key.id()}})">
-		{% endif %}
+
 		<br>
 		{% if blog.image %}
 		<img id="blog-img" src="/img?img_id={{blog.key.id()}}">
 		{% if user == blog.created_by %}
-		<button id="delete-img" onclick="delete_image({{blog.key.id()}})">Delete Image</button>
+		<button class="button" id="delete-img" onclick="delete_image({{blog.key.id()}})">Delete Image</button>
 		{% endif %}
+		{% endif %}
+		{% if user == blog.created_by %}
+		<input type="file" id="img" onchange="upload_image({{blog.key.id()}})" style="display: none;">
+		<button class="button" onclick="document.getElementById('img').click();">
+			Upload Image
+		</button>
 		{% endif %}
 
 		{% if user == blog.created_by %}
@@ -31,16 +35,16 @@
 		<section id="existing-comments">
 			{% for comment in comments %}
 			<div id="comment-{{comment.key.id()}}">
-				<pre>{{comment.user}}: {{comment.content}}</pre>
+				<p class="blog-body">{{comment.user}}: {{comment.content}}</p>
 				{% if (user == comment.user) or (user == blog.created_by) %}
-				<button onclick="delete_comment({{comment.key.id()}},{{blog.key.id()}})">Delete Comment</button>
+				<button class="button" onclick="delete_comment({{comment.key.id()}},{{blog.key.id()}})">Delete Comment</button>
 				{% endif %}
 
-				{% if user == comment.user %}
-				<button id="edit-comment-{{comment.key.id()}}" onclick="toggle_edit_comment({{comment.key.id()}}, '{{comment.content}}')" >
+				{%- if user == comment.user -%}
+				<button class="button" id="edit-comment-{{comment.key.id()}}" onclick="toggle_edit_comment({{comment.key.id()}}, '{{comment.content}}')" >
 					Edit
 				</button>
-				{% endif %}
+				{%- endif -%}
 				<hr>
 
 			</div>
@@ -49,7 +53,7 @@
 		<section id="add-comments">
 			<p id="error"></p>
 			<textarea id="new-comment"></textarea>
-			<button id="submit-comment" onclick="commentRequest({{blog.key.id()}})">Submit</button>
+			<button class="button" id="submit-comment" onclick="commentRequest({{blog.key.id()}})">Submit Comment</button>
 		</section>
 	</article>
 </content>

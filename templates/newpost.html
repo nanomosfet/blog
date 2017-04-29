@@ -4,17 +4,17 @@
 
 <form method="post">
     <label>
-        <div>Subject</div>
+        <h3>Subject</h3>
         <input type="text" name="subject" value="{{subject}}">
     </label>
 
     <label>
-        <div>Content</div>
+        <h3>Content</h3>
         <textarea name="content">{{content}}</textarea>
     </label>
-    <div>
+
         <input type="submit">
-    </div>
+
 </form>
 <div class="error">{{error}}</div>
 {% endblock %}

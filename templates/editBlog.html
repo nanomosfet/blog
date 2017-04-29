@@ -12,10 +12,11 @@
         <div>Content</div>
         <textarea name="content">{{blog.content}}</textarea>
     </label>
+    <p id="error">{{error}}</div>
     <div>
         <input type="submit" value="Edit">
     </div>
-    
+
 </form>
 <form method="post">
 	<div>
@@ -27,6 +28,5 @@
         <input type="submit" name="cancel" value="Cancel">
     </div>
 </form>
-<div class="error">{{error}}</div>
 {% endblock %}
 {% include "footer.html" %}
