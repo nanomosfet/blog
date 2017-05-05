@@ -185,8 +185,10 @@ class bloglistHandler(Handler):
 			blogs = Blogs.query()
 			blogs = blogs.filter(Blogs.created_by == user_id)
 			blogs = blogs.order(-Blogs.created)
+			page_title = user_id + "'s Blogs"
 		else:
 			blogs = Blogs.query().order(-Blogs.created)
+			page_title = "Latest Blogs"
 		user = self.user_set(False)
 		likes_for_page = Likes.generate_likes_list(user,blogs)
 		error = ''
@@ -197,7 +199,7 @@ class bloglistHandler(Handler):
 			error = error,
 			liked_idx = 0,
 			user = user,
-			page_title = 'Latest Blogs')
+			page_title = page_title)
 
 	def post(self):
 		blogs = Blogs.query().order(-Blogs.created)

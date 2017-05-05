@@ -1,7 +1,7 @@
 {% include "base.html" %}
 {% block main_content %}
-<content id="blog-list">
-</title>
+<content id="main-content" class="main-content">
+
 {% for blog in blogs %}
   <article class="blog">
     <a class="blog-subject"href="/{{blog.key.id()}}">{{blog.subject}}</a>

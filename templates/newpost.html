@@ -1,21 +1,22 @@
 {% include "base.html" %}
 
 {% block main_content %}
+<content id="main-content" class="main-content">
+	<form method="post">
+	    <label>
+	        <h3>Subject</h3>
+	        <input type="text" name="subject" value="{{subject}}">
+	    </label>
 
-<form method="post">
-    <label>
-        <h3>Subject</h3>
-        <input type="text" name="subject" value="{{subject}}">
-    </label>
+	    <label>
+	        <h3>Content</h3>
+	        <textarea name="content">{{content}}</textarea>
+	    </label>
 
-    <label>
-        <h3>Content</h3>
-        <textarea name="content">{{content}}</textarea>
-    </label>
+	        <input type="submit">
 
-        <input type="submit">
-
-</form>
-<div class="error">{{error}}</div>
+	</form>
+	<div class="error">{{error}}</div>
+</content>
 {% endblock %}
 {% include "footer.html" %}

@@ -1,19 +1,20 @@
 {% include "base.html" %}
 
 {% block main_content %}
+<content id="main-content" class="main-content">
+	<form method="post">
+	    <label>Username
+	        <input type="text" name="username">
+	    </label>
+	    <label>Password
+	        <input type="password" name="password">
+	    </label>
+	    <br>
+	    {{ loginError }}
 
-<form method="post">    
-    <label>Username
-        <input type="text" name="username">
-    </label>
-    <label>Password
-        <input type="password" name="password">
-    </label>
-    <br>
-    {{ loginError }}
-    
-    <input type="submit">
-</form>
+	    <input type="submit">
+	</form>
+</content>
 {% endblock %}
 
 {% include "footer.html" %}

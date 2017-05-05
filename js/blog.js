@@ -2,13 +2,28 @@
 var drawer = document.getElementById("drawer");
 var menu = document.getElementById("menu");
 
+var toggle_nav = 0;
 
 
 
 menu.addEventListener('click', function(e) {
-	drawer.classList.toggle('open');
-	e.stopPropagation();
+		drawer.classList.toggle('open');
+		e.stopPropagation();
+		toggle_nav = !toggle_nav;
+		console.log(toggle_nav);
 });
+
+
+
+document.getElementById("main-content").addEventListener('click', function(e) {
+	if(toggle_nav) { 
+		drawer.classList.toggle('open');
+		e.stopPropagation();
+		toggle_nav = !toggle_nav;
+		console.log(toggle_nav);
+	}
+});	
+
 
 
 
@@ -252,10 +267,12 @@ function upload_image(blog_id) {
 	var formData = new FormData();
 	var img_element = document.getElementById("blog-img");
 	var blog_body = document.getElementById("blog-body");
+	var blog_content = document.getElementById("blog-content")
 	var delete_image_button = document.createElement("button");
 	var t = document.createTextNode("Delete Photo")
 	delete_image_button.appendChild(t);
 	delete_image_button.id = "delete-img";
+	delete_image_button.classList = "button";
 	delete_image_button.onclick = function() {
 		delete_image(blog_id);
 	};
@@ -273,9 +290,10 @@ function upload_image(blog_id) {
 				img_element = document.createElement("img");
 				img_element.id = "blog-img";
 				img_element.src = "/img?img_id="+String(blog_id) +"&n=" + rand_num;
-				blog_body.appendChild(img_element);
-				blog_body.appendChild(delete_image_button);
-				delete_image_button.classList = "button";
+				
+				blog_content.insertAdjacentElement("afterend", delete_image_button);
+				blog_content.insertAdjacentElement("afterend", img_element);
+				
 			} else {
 				img_element.src = "/img?img_id="+String(blog_id) +"&n=" + rand_num;
 			}

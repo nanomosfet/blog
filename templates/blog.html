@@ -1,13 +1,12 @@
 {% include "base.html" %}
 
 {% block main_content %}
-<content id="blog" class="main-content">
+<content id="main-content" class="main-content">
 	<article id="blog-body">
 		<h4 class="subject">{{blog.subject}}</h4>
-		<p class="blog-body">{{blog.content}}</p>
 		<p class="created_by">Created by: {{blog.created_by}}</p>
+		<p id="blog-content">{{blog.content}}</p>
 
-		<br>
 		{% if blog.image %}
 		<img id="blog-img" src="/img?img_id={{blog.key.id()}}">
 		{% if user == blog.created_by %}
@@ -52,6 +51,7 @@
 		</section>
 		<section id="add-comments">
 			<p id="error"></p>
+			<p>Add a comment below:</p>
 			<textarea id="new-comment"></textarea>
 			<button class="button" id="submit-comment" onclick="commentRequest({{blog.key.id()}})">Submit Comment</button>
 		</section>

@@ -11,44 +11,41 @@
 	</head>
 
 	<body>
-		<header>
+		<header class="header">
 			<h1 class="page-title">{{page_title}}</h1>
+			{% if user %}
+			<p class="logged-user">Signed in as {{user}}</p>
+			{% endif %}
+			<nav id="drawer" class="nav">
+				<ul class="nav__list">
+					<li class="nav__item">
+						<a href="/">Latest Blogs</a>
+					</li>
+					{% if not user %}
+					<li class="nav__item">
+						<a href="/signup">Sign Up</a>
+					</li>
+					<li class="nav__item">
+						<a href="/login">Login</a>
+					</li>
+					{% else %}
+
+					<li class="nav__item">
+						<a href="/?user_id={{user}}">Your posts</a>
+					</li>
+					<li class="nav__item">
+						<a href="/newpost">New Post</a>
+					</li>
+					<li class="nav__item">
+						<a href="/logout">Logout</a>
+					</li>
+
+					{% endif%}
+				</ul>
+			</nav>
 			<a id="menu" class="menu">&#9776;</a>
 			<a id="back" class="menu" href="/">&#127968;</a>
 
 		</header>
 
-		<nav id="drawer" class="nav">
-			<ul class="nav__list">
-				<li class="nav__item">
-					<a href="/">Home</a>
-				</li>
-				</li>
-				{% if not user %}
-				<li class="nav__item">
-					<a href="/signup">Sign Up</a>
-				</li>
-				<li class="nav__item">
-					<a href="/login">Login</a>
-				</li>
-				{% else %}
 
-				<li class="nav__item">
-					<a href="/?user_id={{user}}">Your posts</a>
-				</li>
-				<li class="nav__item">
-					<a href="/newpost">New Post</a>
-				</li>
-				<li class="nav__item">
-					<a href="/logout">Logout</a>
-				</li>
-				<li class="nav__item">
-					<p>Signed in as {{user}}</p>
-				</li>
-
-				{% endif%}
-			</ul>
-			<
-		</nav>
-		{% block main_content %}
-		{% endblock %}

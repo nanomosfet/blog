@@ -1,32 +1,34 @@
 {% include "base.html" %}
 
 {% block main_content %}
+<content id="main-content">
 
-<form method="post">
-    <label>
-        <div>Subject</div>
-        <input type="text" name="subject" value="{{blog.subject}}">
-    </label>
+    <form method="post">
+        <label>
+            <div>Subject</div>
+            <input type="text" name="subject" value="{{blog.subject}}">
+        </label>
 
-    <label>
-        <div>Content</div>
-        <textarea name="content">{{blog.content}}</textarea>
-    </label>
-    <p id="error">{{error}}</div>
-    <div>
-        <input type="submit" value="Edit">
-    </div>
+        <label>
+            <div>Content</div>
+            <textarea name="content">{{blog.content}}</textarea>
+        </label>
+        <p id="error">{{error}}</div>
+        <div>
+            <input type="submit" value="Edit">
+        </div>
 
-</form>
-<form method="post">
-	<div>
-        <input type="submit" name="delete" value="Delete">
-    </div>
-</form>
-<form method="post">
-	<div>
-        <input type="submit" name="cancel" value="Cancel">
-    </div>
-</form>
+    </form>
+    <form method="post">
+    	<div>
+            <input type="submit" name="delete" value="Delete">
+        </div>
+    </form>
+    <form method="post">
+    	<div>
+            <input type="submit" name="cancel" value="Cancel">
+        </div>
+    </form>
+</content>
 {% endblock %}
 {% include "footer.html" %}
