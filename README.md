@@ -12,9 +12,9 @@
 ## How to set this site up for your self
 
 1. Install the following tools
-  1. Standard Google Cloud SDK for Python
-  2. Python
-  3. Jinja2
+  * Standard Google Cloud SDK for Python
+  * Python
+  * Jinja2
 2. From the blog directory - i.e., where the app.yaml file is located run `dev_appserver.py app.yaml`.
 3. In a browser open to where your local web server is - for example, `localhost:8080`.
 4. Now you should be able to use the site on your local web server.
