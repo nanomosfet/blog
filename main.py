@@ -45,8 +45,8 @@ class Handler(webapp2.RequestHandler):
 			if user:
 				user_exists = Users.query();
 				user_exists = user_exists.filter(Users.user == user)
-			if user_exists is not None:
-				return user	
+				if user_exists is not None:
+					return user	
 		if not user and redirect:
 			self.redirect("/login")
 		return user
@@ -179,41 +179,48 @@ class blogHandler(Handler):
 	
 
 class editpostHandler(Handler):
-	def get(self, blog_id):
-		blog = Blogs.get_by_id(int(blog_id))
+	def get(self, blog_id):		
 		user = self.user_set()
-		error = ''
-		page_title = 'Edit ' + blog.subject
-		self.render(
-			'editBlog.html',
-			user = user,
-			blog = blog,
-			error = error,
-			page_title = page_title)
+		error = ''		
+		if Blogs.blog_exists(int(blog_id)) and user:
+			blog = Blogs.get_by_id(int(blog_id))
+			page_title = 'Edit ' + blog.subject	
+			if user and user == blog.created_by:
+				self.render(
+					'editBlog.html',
+					user = user,
+					blog = blog,
+					error = error,
+					page_title = page_title)
+			else:
+				self.redirect('/')
 	
-	def post(self, blog_id):
-		blog = Blogs.get_by_id(int(blog_id))
+	def post(self, blog_id):		
 		user = self.user_set()
 		subject = self.request.get('subject')
 		content = self.request.get('content')
-		page_title = 'Edit ' + blog.subject
-		if user == blog.created_by and Blogs.blog_exists(int(blog_id)):
-			if subject and content:
-				blog.subject = subject
-				blog.content = content
-				blog.put()
-				error = 'You have edited your blog!'
+		if Blogs.blog_exists(int(blog_id)) and user:
+			blog = Blogs.get_by_id(int(blog_id))
+			page_title = 'Edit ' + blog.subject
+			if user == blog.created_by and Blogs.blog_exists(int(blog_id)):
+				if subject and content:
+					blog.subject = subject
+					blog.content = content
+					blog.put()
+					error = 'You have edited your blog!'
+				else:
+					error = 'You need to have a Subject and Content to your blog!'
 			else:
-				error = 'You need to have a Subject and Content to your blog!'
+				self.redirect('/')
+				return
+			self.render(
+				'editBlog.html',
+				user = user,
+				blog = blog,
+				error = error,
+				page_title = page_title)
 		else:
 			self.redirect('/')
-			return
-		self.render(
-			'editBlog.html',
-			user = user,
-			blog = blog,
-			error = error,
-			page_title = page_title)
 
 class deletepostHandler(Handler):
 	def post(self, blog_id):
@@ -414,11 +421,6 @@ class deleteCommentHandler(Handler):
 				blog.num_comments -= 1
 				blog.put()
 				return
-
-
-
-
-
 
 app = webapp2.WSGIApplication([
 		('/', bloglistHandler),
