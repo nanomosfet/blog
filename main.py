@@ -80,7 +80,6 @@ class signupHandler(Handler):
 		user = False,
 		page_title = "Sign Up")
 	def post(self):
-		#self.response.headers['Content-Type'] = 'text/plain'
 		username= self.request.get('username')
 		password= self.request.get('password')
 		verify= self.request.get('verify')
@@ -113,7 +112,7 @@ class signupHandler(Handler):
 
 		if not hasError:
 			password = hashpass.make_pw_hash(username, password)
-			u = Users(user = username, password = password)
+			u = Users(user = username, password = password, email = email)
 			u.put()
 			value = cookieStuff.make_secure_val(username)
 			self.response.headers.add_header(
@@ -130,53 +129,7 @@ class signupHandler(Handler):
 			user = False,
 			page_title = "Sign Up")
 
-class Blogs(db.Model):
-	subject = db.StringProperty(required = True)
-	content = db.TextProperty(required = True)
-	created = db.DateTimeProperty(auto_now_add = True)
-	created_by = db.StringProperty(required = True)
-	num_likes = db.IntegerProperty(required = True)
-	num_comments = db.IntegerProperty()
-	image = db.BlobProperty()
 
-class Users(db.Model):
-	user = db.StringProperty(required = True)
-	password = db.StringProperty(required = True)
-
-	@classmethod
-	def by_username(cls, username):
-		return cls.query().filter(cls.user == username).get()
-
-class Likes(db.Model):
-	user = db.StringProperty(required = True)
-	blog_id = db.IntegerProperty(required = True)
-
-	@classmethod
-	def already_liked(cls,username,blog_id):
-		if not username:
-			return False
-		find_user_like = cls.query().filter(cls.user == username)
-		find_post_like = find_user_like.filter(cls.blog_id == blog_id)
-		if find_post_like.get() is None:
-			return False
-		else:
-			return find_post_like
-
-	@classmethod
-	def generate_likes_list(cls,user,blogs):
-		likes_for_page = []
-		for blog in blogs:
-			if Likes.already_liked(user,blog.key.id()):
-				likes_for_page.append(True)
-			else:
-				likes_for_page.append(False)
-		return likes_for_page
-
-class Comments(db.Model):
-	content = db.TextProperty(required = True)
-	user = db.StringProperty(required = True)
-	parent_blog = db.IntegerProperty(required = True)
-	created = db.DateTimeProperty(auto_now_add = True)
 
 class bloglistHandler(Handler):
 	def get(self):
@@ -239,7 +192,9 @@ class blogHandler(Handler):
 	def get(self, blogID):
 		blog = Blogs.get_by_id(int(blogID))
 		user = self.user_set(False)
-		comments = Comments.query().filter(Comments.parent_blog == int(blogID)).order(Comments.created)
+		comments = Comments.query()
+		comments = comments.filter(Comments.parent_blog == int(blogID))
+		comments = comments.order(Comments.created)
 		self.render(
 			'blog.html',
 			blog = blog,
@@ -258,7 +213,8 @@ class blogHandler(Handler):
 		error = ''
 		if self.request.get('delete') and blog.created_by == user:
 
-			comments = Comments.query().filter(Comments.parent_blog == int(blogID))
+			comments = Comments.query()
+			comments = comments.filter(Comments.parent_blog == int(blogID))
 			likes = Likes.query().filter(Likes.blog_id == int(blogID))
 			for comment in comments:
 				comment.key.delete()
@@ -492,7 +448,10 @@ class commentsHandler(Handler):
 		if add_comment:
 			if user and comment_text:
 				blog = Blogs.get_by_id(int(blog_id))
-				c = Comments(content = comment_text, user = user, parent_blog = int(blog_id))
+				c = Comments(
+					content = comment_text, 
+					user = user, 
+					parent_blog = int(blog_id))
 				c.put()
 				blog.num_comments += 1
 				blog.put()
@@ -515,6 +474,55 @@ class commentsHandler(Handler):
 				'ret_val': False
 				}
 				self.write(json.dumps(json_response))
+
+class Blogs(db.Model):
+	subject = db.StringProperty(required = True)
+	content = db.TextProperty(required = True)
+	created = db.DateTimeProperty(auto_now_add = True)
+	created_by = db.StringProperty(required = True)
+	num_likes = db.IntegerProperty(required = True)
+	num_comments = db.IntegerProperty()
+	image = db.BlobProperty()
+
+class Users(db.Model):
+	user = db.StringProperty(required = True)
+	password = db.StringProperty(required = True)
+	email = db.StringProperty()
+
+	@classmethod
+	def by_username(cls, username):
+		return cls.query().filter(cls.user == username).get()
+
+class Likes(db.Model):
+	user = db.StringProperty(required = True)
+	blog_id = db.IntegerProperty(required = True)
+
+	@classmethod
+	def already_liked(cls,username,blog_id):
+		if not username:
+			return False
+		find_user_like = cls.query().filter(cls.user == username)
+		find_post_like = find_user_like.filter(cls.blog_id == blog_id)
+		if find_post_like.get() is None:
+			return False
+		else:
+			return find_post_like
+
+	@classmethod
+	def generate_likes_list(cls,user,blogs):
+		likes_for_page = []
+		for blog in blogs:
+			if Likes.already_liked(user,blog.key.id()):
+				likes_for_page.append(True)
+			else:
+				likes_for_page.append(False)
+		return likes_for_page
+
+class Comments(db.Model):
+	content = db.TextProperty(required = True)
+	user = db.StringProperty(required = True)
+	parent_blog = db.IntegerProperty(required = True)
+	created = db.DateTimeProperty(auto_now_add = True)
 
 app = webapp2.WSGIApplication([
 		('/', bloglistHandler),

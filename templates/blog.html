@@ -23,15 +23,15 @@
 		{% if user == blog.created_by %}
 
 		<form method="post">
-			<div>
 		        <input type="submit" name="edit_blog" value="Edit Blog">
-		    </div>
 		</form>
 		{% endif %}
 	</article>
 
-	<article id="comments">
+	<details id="comments">
+		<summary>Comments</summary>
 		<section id="existing-comments">
+			<!-- <h4>Comments</h4> -->
 			{% for comment in comments %}
 			<div id="comment-{{comment.key.id()}}">
 				<p class="blog-body">{{comment.user}}: {{comment.content}}</p>
@@ -55,7 +55,7 @@
 			<textarea id="new-comment"></textarea>
 			<button class="button" id="submit-comment" onclick="commentRequest({{blog.key.id()}})">Submit Comment</button>
 		</section>
-	</article>
+	</details>
 </content>
 {% endblock %}
 {% include "footer.html" %}

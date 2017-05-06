@@ -18,9 +18,11 @@
     {%- else -%}
     	Like
     {%- endif %}
-    	</button>
+    </button>
+    <div>
     	<span id="num_likes-{{loop.index}}">&#128077; {{blog.num_likes}} |</span>
     	<a href="/{{blog.key.id()}}" id="num_comments"> Comments[{{blog.num_comments}}]</a>
+    </div>
     <div id="error-{{loop.index}}"></div>
   </article>
 {% endfor %}
