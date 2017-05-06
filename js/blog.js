@@ -65,7 +65,7 @@ function likeRequest(loop, blog_id) {
 			} else if (json_obj.net_like == 1) {
 				document.getElementById("like-"+String(loop)).innerHTML = "Unlike";
 			}
-			document.getElementById("num_likes-"+String(loop)).innerHTML = "&#128077; " + json_obj.num_likes;
+			document.getElementById("num_likes-"+String(loop)).innerHTML = "&#128077; " + json_obj.num_likes + " | ";
 			setTimeout(function(){
 				fade(error_element);
 			},1000);
