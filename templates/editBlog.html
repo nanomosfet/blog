@@ -14,12 +14,12 @@
             <input type="submit" value="Edit">
         </div>
     </form>
-    <form method="post">
+    <form method="post" action="/{{blog.key.id()}}/delete">
     	<div>
             <input type="submit" name="delete" value="Delete">
         </div>
     </form>
-    <form method="post">
+    <form action="/{{blog.key.id()}}">
     	<div>
             <input type="submit" name="cancel" value="Cancel">
         </div>

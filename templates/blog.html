@@ -19,9 +19,8 @@
 		{% endif %}
 
 		{% if user == blog.created_by %}
-
-			<form method="post">
-			        <input type="submit" name="edit_blog" value="Edit Blog">
+			<form action="/{{blog.key.id()}}/edit">
+			    <input type="submit" value="Edit Blog">
 			</form>
 		{% endif %}
 	</article>

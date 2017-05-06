@@ -10,9 +10,17 @@ import re
 import cookieStuff
 import hashpass
 import json
+import database_models
+import Valid
+
+Valid = Valid.Valid
+Blogs = database_models.Blogs
+Likes = database_models.Likes
+Comments = database_models.Comments
+Users = database_models.Users
 
 from google.appengine.api import images
-from google.appengine.ext import ndb as db
+
 
 template_dir = os.path.join(os.path.dirname(__file__), "templates")
 jinja_env = jinja2.Environment(loader = jinja2.FileSystemLoader(template_dir),
@@ -34,6 +42,11 @@ class Handler(webapp2.RequestHandler):
 		user = False
 		if user_cookie:
 			user = cookieStuff.check_secure_val(user_cookie)
+			if user:
+				user_exists = Users.query();
+				user_exists = user_exists.filter(Users.user == user)
+			if user_exists is not None:
+				return user	
 		if not user and redirect:
 			self.redirect("/login")
 		return user
@@ -56,9 +69,6 @@ class imageHandler(Handler):
 				image = images.resize(image, 500,500)
 				blog.image = image
 				blog.put()
-		else:
-			pass
-			# Write error handling
 
 
 class Image(Handler):
@@ -131,6 +141,7 @@ class signupHandler(Handler):
 class bloglistHandler(Handler):
 	def get(self):
 		user_id = self.request.get('user_id')
+		user = self.user_set(False)
 		if user_id:
 			blogs = Blogs.query()
 			blogs = blogs.filter(Blogs.created_by == user_id)
@@ -139,7 +150,7 @@ class bloglistHandler(Handler):
 		else:
 			blogs = Blogs.query().order(-Blogs.created)
 			page_title = "Latest Blogs"
-		user = self.user_set(False)
+		
 		likes_for_page = Likes.generate_likes_list(user,blogs)
 		error = ''
 		self.render(
@@ -151,39 +162,6 @@ class bloglistHandler(Handler):
 			user = user,
 			page_title = page_title)
 
-	def post(self):
-		blogs = Blogs.query().order(-Blogs.created)
-		user = self.user_set(False)
-		liked_idx = self.request.get('blog_idx')
-		blog_id = self.request.get('blog_id')
-		liked_blog = Blogs.get_by_id(int(blog_id))
-		liked = Likes.already_liked(user, int(blog_id))
-		if user == liked_blog.created_by:
-			error = 'You cannot like your own post!'
-		elif not user:
-			error = 'You must be signed in to like someones post!'
-		elif liked:
-			error = 'You have unliked this post!'
-			liked.get().delete()
-			liked_blog.num_likes -= 1
-			liked_blog.put()
-		else:
-			l = Likes(user = user, blog_id = int(blog_id))
-			l.put()
-			liked_blog.num_likes += 1
-			liked_blog.put()
-			error = 'You have liked this post!'
-		likes_for_page = Likes.generate_likes_list(user,blogs)
-		self.render(
-			'bloglist.html',
-			 blogs = blogs,
-			 error = error,
-			 likes_for_page = likes_for_page,
-			 liked_idx = int(liked_idx),
-			 page_title = 'Latest Blogs')
-		self.render(
-			'base.html',
-			user = user)
 
 class blogHandler(Handler):
 	def get(self, blogID):
@@ -199,41 +177,60 @@ class blogHandler(Handler):
 			comments = comments,
 			page_title = blog.subject)
 	
-	def post(self, blogID):
-		blog = Blogs.get_by_id(int(blogID))
-		subject = self.request.get('subject')
-		content = self.request.get('content')
-		cancel = self.request.get('cancel')
-		edit_blog = self.request.get('edit_blog')
-		user = self.user_set(False)
-		if cancel:
-			self.redirect('/%s' % blogID)
-		error = ''
-		if self.request.get('delete') and blog.created_by == user:
 
-			comments = Comments.query()
-			comments = comments.filter(Comments.parent_blog == int(blogID))
-			likes = Likes.query().filter(Likes.blog_id == int(blogID))
-			for comment in comments:
-				comment.key.delete()
-			for like in likes:
-				like.key.delete()
-			blog.key.delete()
-			self.redirect('/')
-		if blog.created_by == user and subject and content:
-			blog.subject = subject
-			blog.content = content
-			blog.put()
-			error = 'You have edited your blog'
-		elif not edit_blog:
-			error = "We need both Subject and Content for each post"
-		comments = Comments.query().filter(Comments.parent_blog == int(blogID))
+class editpostHandler(Handler):
+	def get(self, blog_id):
+		blog = Blogs.get_by_id(int(blog_id))
+		user = self.user_set()
+		error = ''
+		page_title = 'Edit ' + blog.subject
 		self.render(
 			'editBlog.html',
 			user = user,
 			blog = blog,
 			error = error,
-			page_title = blog.subject)
+			page_title = page_title)
+	
+	def post(self, blog_id):
+		blog = Blogs.get_by_id(int(blog_id))
+		user = self.user_set()
+		subject = self.request.get('subject')
+		content = self.request.get('content')
+		page_title = 'Edit ' + blog.subject
+		if user == blog.created_by and Blogs.blog_exists(int(blog_id)):
+			if subject and content:
+				blog.subject = subject
+				blog.content = content
+				blog.put()
+				error = 'You have edited your blog!'
+			else:
+				error = 'You need to have a Subject and Content to your blog!'
+		else:
+			self.redirect('/')
+			return
+		self.render(
+			'editBlog.html',
+			user = user,
+			blog = blog,
+			error = error,
+			page_title = page_title)
+
+class deletepostHandler(Handler):
+	def post(self, blog_id):
+		user = self.user_set()
+		blog_exists = Blogs.blog_exists(int(blog_id))
+		if user and blog_exists:
+			blog = Blogs.get_by_id(int(blog_id))
+			if user == blog.created_by:
+				comments = Comments.query()
+				comments = comments.filter(Comments.parent_blog == int(blog_id))
+				likes = Likes.query().filter(Likes.blog_id == int(blog_id))
+				for comment in comments:
+					comment.key.delete()
+				for like in likes:
+					like.key.delete()
+				blog.key.delete()
+		self.redirect('/')
 
 class newpostHandler(Handler):
 	def get(self):
@@ -251,7 +248,7 @@ class newpostHandler(Handler):
 		subject = self.request.get('subject')
 		content = self.request.get('content')
 
-		if subject and content:
+		if subject and content and user:
 			b = Blogs(
 				subject = subject,
 				content = content,
@@ -313,24 +310,25 @@ class likesHandler(Handler):
 		liked_blog = Blogs.get_by_id(int(blog_id))
 		liked = Likes.already_liked(user, int(blog_id))
 		net_like = 0
-		if user == liked_blog.created_by:
-			error = 'You cannot like your own post!'
-		elif not user:
-			error = 'You must be signed in to like someones post!'
-		elif liked:
-			error = 'You have unliked this post!'
-			liked.get().key.delete()
-			liked_blog.num_likes -= 1
-			liked_blog.put()
-			net_like = -1
+		if Blogs.blog_exists(int(blog_id)):	
+			if user == liked_blog.created_by:
+				error = 'You cannot like your own post!'
+			elif not user:
+				error = 'You must be signed in to like someones post!'
+			elif liked:
+				error = 'You have unliked this post!'
+				liked.get().key.delete()
+				liked_blog.num_likes -= 1
+				liked_blog.put()
+				net_like = -1
 
-		else:
-			l = Likes(user = user, blog_id = int(blog_id))
-			l.put()
-			liked_blog.num_likes += 1
-			liked_blog.put()
-			error = 'You have liked this post!'
-			net_like = 1
+			else:
+				l = Likes(user = user, blog_id = int(blog_id))
+				l.put()
+				liked_blog.num_likes += 1
+				liked_blog.put()
+				error = 'You have liked this post!'
+				net_like = 1
 
 		json_response = {
 			'error': error,
@@ -340,27 +338,48 @@ class likesHandler(Handler):
 		self.write(json.dumps(json_response))
 
 
-class commentsHandler(Handler):
+class addCommentHandler(Handler):
 	def post(self):
 		blog_id = self.request.get('blog_id')
-		comment_text = self.request.get('comment_text')
 		user = self.user_set(False)
-		delete_comment = self.request.get('delete_comment')
 		comment_id = self.request.get('comment_id')
-		update_comment = self.request.get('update_comment')
-		add_comment = self.request.get('add_comment')
+		comment_text = self.request.get('comment_text')
 
-
-		if delete_comment:
-			comment = Comments.get_by_id(int(comment_id))
+		if user and comment_text and Blogs.blog_exists(int(blog_id)):
 			blog = Blogs.get_by_id(int(blog_id))
-			if user == comment.user or user == blog.created_by:
-				comment.key.delete()
-				blog.num_comments -= 1
-				blog.put()
-				return
+			c = Comments(
+				content = comment_text, 
+				user = user, 
+				parent_blog = int(blog_id))
+			c.put()
+			blog.num_comments += 1
+			blog.put()
+			json_response = {
+				'error': 'Thanks for adding a comment!',
+				'user': user,
+				'ret_val': True,
+				'comment_id': c.key.id()
+			}
+			self.write(json.dumps(json_response))
+		elif not user:
+			json_response = {
+			'error': 'You must be signed in to add a comment',
+			'ret_val': False
+			}
+			self.write(json.dumps(json_response))
+		elif not comment_text:
+			json_response = {
+			'error': 'You cannot add a blank comment',
+			'ret_val': False
+			}
+			self.write(json.dumps(json_response))
 
-		if update_comment:
+class updateCommentHandler(Handler):
+	def post(self):
+		user = self.user_set(False)
+		comment_id = self.request.get('comment_id')
+		comment_text = self.request.get('comment_text')
+		if Comments.comment_exists(int(comment_id)):
 			comment = Comments.get_by_id(int(comment_id))
 			if comment and user == comment.user and comment_text:
 				comment.content = comment_text
@@ -380,122 +399,41 @@ class commentsHandler(Handler):
 				}
 				self.write(json.dumps(json_response))
 
-		if not user:
-			error = 'You must be signed in to comment on a blog!'
-			ret_val = 0
-		if add_comment:
-			if user and comment_text:
-				blog = Blogs.get_by_id(int(blog_id))
-				c = Comments(
-					content = comment_text, 
-					user = user, 
-					parent_blog = int(blog_id))
-				c.put()
-				blog.num_comments += 1
+class deleteCommentHandler(Handler):
+	def post(self):
+		blog_id = self.request.get('blog_id')
+		user = self.user_set(False)
+		comment_id = self.request.get('comment_id')
+		blog_exists = Blogs.blog_exists(int(blog_id))
+		comment_exists = Comments.comment_exists(int(comment_id))
+		if user and comment_exists and blog_exists:
+			comment = Comments.get_by_id(int(comment_id))
+			blog = Blogs.get_by_id(int(blog_id))
+			if user == comment.user or user == blog.created_by:
+				comment.key.delete()
+				blog.num_comments -= 1
 				blog.put()
-				json_response = {
-					'error': 'Thanks for adding a comment!',
-					'user': user,
-					'ret_val': True,
-					'comment_id': c.key.id()
-				}
-				self.write(json.dumps(json_response))
-			elif not user:
-				json_response = {
-				'error': 'You must be signed in to add a comment',
-				'ret_val': False
-				}
-				self.write(json.dumps(json_response))
-			elif not comment_text:
-				json_response = {
-				'error': 'You cannot add a blank comment',
-				'ret_val': False
-				}
-				self.write(json.dumps(json_response))
+				return
 
-class Blogs(db.Model):
-	subject = db.StringProperty(required = True)
-	content = db.TextProperty(required = True)
-	created = db.DateTimeProperty(auto_now_add = True)
-	created_by = db.StringProperty(required = True)
-	num_likes = db.IntegerProperty(required = True)
-	num_comments = db.IntegerProperty()
-	image = db.BlobProperty()
 
-class Users(db.Model):
-	user = db.StringProperty(required = True)
-	password = db.StringProperty(required = True)
-	email = db.StringProperty()
 
-	@classmethod
-	def by_username(cls, username):
-		return cls.query().filter(cls.user == username).get()
 
-class Likes(db.Model):
-	user = db.StringProperty(required = True)
-	blog_id = db.IntegerProperty(required = True)
 
-	@classmethod
-	def already_liked(cls,username,blog_id):
-		if not username:
-			return False
-		find_user_like = cls.query().filter(cls.user == username)
-		find_post_like = find_user_like.filter(cls.blog_id == blog_id)
-		if find_post_like.get() is None:
-			return False
-		else:
-			return find_post_like
-
-	@classmethod
-	def generate_likes_list(cls,user,blogs):
-		likes_for_page = []
-		for blog in blogs:
-			if Likes.already_liked(user,blog.key.id()):
-				likes_for_page.append(True)
-			else:
-				likes_for_page.append(False)
-		return likes_for_page
-
-class Comments(db.Model):
-	content = db.TextProperty(required = True)
-	user = db.StringProperty(required = True)
-	parent_blog = db.IntegerProperty(required = True)
-	created = db.DateTimeProperty(auto_now_add = True)
-
-class Valid():
-	USER_RE = re.compile("^[a-zA-Z0-9_-]{3,20}$")
-	PASS_RE = re.compile("^.{3,20}$")
-	EMAIL_RE = re.compile("^[\S]+@[\S]+.[\S]+$")
-	@classmethod
-	def username(self, username):
-		return self.USER_RE.match(username)
-
-	@classmethod
-	def password(self, password):
-		return self.PASS_RE.match(password)
-
-	@classmethod
-	def email(self, email):
-		return self.EMAIL_RE.match(email)
-
-	@classmethod
-	def user_exists(self, username):
-		user = Users.query().filter(Users.user == username).get()
-		if user:
-			return user
-		else:
-			return False
 
 app = webapp2.WSGIApplication([
 		('/', bloglistHandler),
 		('/(\d+)', blogHandler),
+		('/(\d+)/edit', editpostHandler),
+		('/(\d+)/delete', deletepostHandler),
 		('/newpost', newpostHandler),
 		('/signup', signupHandler),
 		('/welcome', welcomeHandler),
 		('/login', loginHandler),
 		('/logout', logoutHandler),
 		('/likes', likesHandler),
-		('/comments', commentsHandler),
+		('/addcomment', addCommentHandler),
+		('/deletecomment', deleteCommentHandler),
+		('/updatecomment', updateCommentHandler),
 		('/img', Image),
 		('/images', imageHandler),
 	], debug=True)

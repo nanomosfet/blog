@@ -83,8 +83,7 @@ function commentRequest(blog_id) {
 	var new_comment =  document.getElementById("new-comment").value;
 	var form = new FormData();
 	form.append('blog_id', blog_id);
-	form.append('comment_text',new_comment);
-	form.append('add_comment', true);
+	form.append('comment_text', new_comment);
 	var comment_section = document.getElementById("existing-comments");
 	var error_element = document.getElementById("error");
 	error_element.style.display = 'block';
@@ -128,7 +127,7 @@ function commentRequest(blog_id) {
 			document.getElementById("new-comment").value = '';
 		}
 	}
-	http_request.open("POST", "/comments", true);
+	http_request.open("POST", "/addcomment", true);
 	console.log(form);
 	http_request.send(form);
 }
@@ -137,24 +136,23 @@ var edit_comment_mode = false;
 // Handles DOM element manipulation and AJAX request for deleting comments
 function delete_comment(comment_id, blog_id) {
 	var http_request = new XMLHttpRequest();
-	var id = "comment_id=" + comment_id;
-	var delete_comment = "delete_comment=true"
-	var blog_id = "blog_id=" + blog_id;
+	var form = new FormData();
+	form.append("comment_id",comment_id);
+	form.append("blog_id", blog_id);
+
 	var comment_element = document.getElementById("comment-" + comment_id)	
 	// Ignore any clicks until we are done editing comments
 	if (edit_comment_mode == true) {
 		return 0;
 	}
-	var params = id + "&" + delete_comment + "&" + blog_id;
 	http_request.onreadystatechange = function() {
 		if (this.readyState == 4 && this.status == 200) {
 			comment_element.remove();
 		}
 	}
-	http_request.open("POST", "/comments", true);
-	http_request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-	console.log(params);
-	http_request.send(params);
+	http_request.open("POST", "/deletecomment", true);
+	//http_request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+	http_request.send(form);
 }
 // Handles DOM element manipulation and AJAX request for editing comments
 function toggle_edit_comment(comment_id, comment_content) {
@@ -230,7 +228,7 @@ function update_comment(comment_id, comment_content) {
 		}
 
 	};
-	http_request.open("POST", "/comments", true);
+	http_request.open("POST", "/updatecomment", true);
 	http_request.send(form)
 
 }
