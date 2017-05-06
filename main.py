@@ -494,7 +494,6 @@ app = webapp2.WSGIApplication([
 		('/welcome', welcomeHandler),
 		('/login', loginHandler),
 		('/logout', logoutHandler),
-		('/spam', spamHandler),
 		('/likes', likesHandler),
 		('/comments', commentsHandler),
 		('/img', Image),
