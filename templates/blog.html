@@ -1,6 +1,4 @@
 {% include "base.html" %}
-
-{% block main_content %}
 <content id="main-content" class="main-content">
 	<article id="blog-body">
 		<h4 class="subject">{{blog.subject}}</h4>
@@ -8,45 +6,43 @@
 		<p id="blog-content">{{blog.content}}</p>
 
 		{% if blog.image %}
-		<img id="blog-img" src="/img?img_id={{blog.key.id()}}">
-		{% if user == blog.created_by %}
-		<button class="button" id="delete-img" onclick="delete_image({{blog.key.id()}})">Delete Image</button>
+			<img id="blog-img" src="/img?img_id={{blog.key.id()}}">
+			{% if user == blog.created_by %}
+			<button class="button" id="delete-img" onclick="delete_image({{blog.key.id()}})">Delete Image</button>
+			{% endif %}
 		{% endif %}
-		{% endif %}
 		{% if user == blog.created_by %}
-		<input type="file" id="img" onchange="upload_image({{blog.key.id()}})" style="display: none;">
-		<button class="button" onclick="document.getElementById('img').click();">
-			Upload Image
-		</button>
+			<input type="file" id="img" onchange="upload_image({{blog.key.id()}})" style="display: none;">
+			<button class="button" onclick="document.getElementById('img').click();">
+				Upload Image
+			</button>
 		{% endif %}
 
 		{% if user == blog.created_by %}
 
-		<form method="post">
-		        <input type="submit" name="edit_blog" value="Edit Blog">
-		</form>
+			<form method="post">
+			        <input type="submit" name="edit_blog" value="Edit Blog">
+			</form>
 		{% endif %}
 	</article>
-
 	<details id="comments">
 		<summary>Comments</summary>
 		<section id="existing-comments">
-			<!-- <h4>Comments</h4> -->
 			{% for comment in comments %}
-			<div id="comment-{{comment.key.id()}}">
-				<p class="blog-body">{{comment.user}}: {{comment.content}}</p>
-				{% if (user == comment.user) or (user == blog.created_by) %}
-				<button class="button" onclick="delete_comment({{comment.key.id()}},{{blog.key.id()}})">Delete Comment</button>
-				{% endif %}
+				<div id="comment-{{comment.key.id()}}">
+					<p class="blog-body">{{comment.user}}: {{comment.content}}</p>
+					{% if (user == comment.user) or (user == blog.created_by) %}
+						<button class="button" onclick="delete_comment({{comment.key.id()}},{{blog.key.id()}})">Delete Comment</button>
+					{% endif %}
 
-				{%- if user == comment.user -%}
-				<button class="button" id="edit-comment-{{comment.key.id()}}" onclick="toggle_edit_comment({{comment.key.id()}}, '{{comment.content}}')" >
-					Edit
-				</button>
-				{%- endif -%}
-				<hr>
+					{%- if user == comment.user -%}
+						<button class="button" id="edit-comment-{{comment.key.id()}}" onclick="toggle_edit_comment({{comment.key.id()}}, '{{comment.content}}')" >
+							Edit
+						</button>
+					{%- endif -%}
+					<hr>
 
-			</div>
+				</div>
 			{% endfor %}
 		</section>
 		<section id="add-comments">
@@ -57,5 +53,4 @@
 		</section>
 	</details>
 </content>
-{% endblock %}
 {% include "footer.html" %}

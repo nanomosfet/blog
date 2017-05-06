@@ -1,23 +1,21 @@
 {% include "base.html" %}
-{% block main_content %}
 <content id="main-content" class="main-content">
-
 {% for blog in blogs %}
   <article class="blog">
     <a class="blog-subject"href="/{{blog.key.id()}}">{{blog.subject}}</a>
-     {% if blog.image %}
-    <img id="blog-img" src="/img?img_id={{blog.key.id()}}">
+    {% if blog.image %}
+      <img id="blog-img" src="/img?img_id={{blog.key.id()}}">
     {% endif %}
     <p class="blog-body">{{blog.content}}</p>
     <a href="/?user_id={{blog.created_by}}">
       <h3 class="blog-user">Created by: {{blog.created_by}}</h3>
     </a>
     <button class="button" id="like-{{loop.index}}" onclick="likeRequest({{loop.index}},{{blog.key.id()}})">
-    {%- if likes_for_page[loop.index - 1] -%}
-    	Unlike
-    {%- else -%}
-    	Like
-    {%- endif %}
+      {%- if likes_for_page[loop.index - 1] -%}
+      	Unlike
+      {%- else -%}
+      	Like
+      {%- endif %}
     </button>
     <div>
     	<span id="num_likes-{{loop.index}}">&#128077; {{blog.num_likes}} |</span>
@@ -26,6 +24,5 @@
     <div id="error-{{loop.index}}"></div>
   </article>
 {% endfor %}
- </content>
-{% endblock %}
+</content>
 {% include "footer.html" %}

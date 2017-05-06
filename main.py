@@ -18,9 +18,6 @@ template_dir = os.path.join(os.path.dirname(__file__), "templates")
 jinja_env = jinja2.Environment(loader = jinja2.FileSystemLoader(template_dir),
 											autoescape = True)
 
-
-
-
 class Handler(webapp2.RequestHandler):
 	def write(self, *a, **kw):
 		self.response.out.write(*a, **kw)
@@ -201,6 +198,7 @@ class blogHandler(Handler):
 			user = user,
 			comments = comments,
 			page_title = blog.subject)
+	
 	def post(self, blogID):
 		blog = Blogs.get_by_id(int(blogID))
 		subject = self.request.get('subject')
@@ -221,10 +219,8 @@ class blogHandler(Handler):
 			for like in likes:
 				like.key.delete()
 			blog.key.delete()
-
 			self.redirect('/')
-		if blog.created_by == user \
-			and subject and content:
+		if blog.created_by == user and subject and content:
 			blog.subject = subject
 			blog.content = content
 			blog.put()
@@ -237,8 +233,7 @@ class blogHandler(Handler):
 			user = user,
 			blog = blog,
 			error = error,
-			page_title = blog.subject
-			)
+			page_title = blog.subject)
 
 class newpostHandler(Handler):
 	def get(self):
@@ -280,7 +275,6 @@ class welcomeHandler(Handler):
 		user = self.user_set()
 		self.redirect("/newpost")
 
-
 class loginHandler(Handler):
 	def get(self):
 		self.render(
@@ -309,59 +303,6 @@ class logoutHandler(Handler):
 			'Set-Cookie',
 			str('user_id=; Path=/'))
 		self.redirect("/login")
-
-
-class Valid():
-	USER_RE = re.compile("^[a-zA-Z0-9_-]{3,20}$")
-	PASS_RE = re.compile("^.{3,20}$")
-	EMAIL_RE = re.compile("^[\S]+@[\S]+.[\S]+$")
-	@classmethod
-	def username(self, username):
-		return self.USER_RE.match(username)
-
-	@classmethod
-	def password(self, password):
-		return self.PASS_RE.match(password)
-
-	@classmethod
-	def email(self, email):
-		return self.EMAIL_RE.match(email)
-
-	@classmethod
-	def user_exists(self, username):
-		user = Users.query().filter(Users.user == username).get()
-		if user:
-			return user
-		else:
-			return False
-
-
-class spamHandler(Handler):
-	def get(self):
-		kind = self.request.get('kind')
-		b = self.request.get('b')
-		if kind == 'delete':
-			self.delete_all_blogs()
-		elif kind == 'create':
-			if not b:
-				self.spam_site_with_blogs()
-			else:
-				self.spam_site_with_blogs(int(b))
-
-	def spam_site_with_blogs(self,blogs = 10):
-		for i in range(1,blogs):
-			blog = Blogs(
-				subject = "fuck you",
-				content = "I hate you!",
-				created_by = "Travis",
-				num_likes = 0,
-				num_comments = 0)
-			blog.put()
-
-	def delete_all_blogs(self):
-		query = Blogs.query()
-		for blog in query:
-			blog.key.delete()
 
 class likesHandler(Handler):
 	def post(self):
@@ -438,9 +379,6 @@ class commentsHandler(Handler):
 					'ret_val': False,
 				}
 				self.write(json.dumps(json_response))
-
-
-
 
 		if not user:
 			error = 'You must be signed in to comment on a blog!'
@@ -523,6 +461,30 @@ class Comments(db.Model):
 	user = db.StringProperty(required = True)
 	parent_blog = db.IntegerProperty(required = True)
 	created = db.DateTimeProperty(auto_now_add = True)
+
+class Valid():
+	USER_RE = re.compile("^[a-zA-Z0-9_-]{3,20}$")
+	PASS_RE = re.compile("^.{3,20}$")
+	EMAIL_RE = re.compile("^[\S]+@[\S]+.[\S]+$")
+	@classmethod
+	def username(self, username):
+		return self.USER_RE.match(username)
+
+	@classmethod
+	def password(self, password):
+		return self.PASS_RE.match(password)
+
+	@classmethod
+	def email(self, email):
+		return self.EMAIL_RE.match(email)
+
+	@classmethod
+	def user_exists(self, username):
+		user = Users.query().filter(Users.user == username).get()
+		if user:
+			return user
+		else:
+			return False
 
 app = webapp2.WSGIApplication([
 		('/', bloglistHandler),

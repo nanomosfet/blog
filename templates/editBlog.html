@@ -1,14 +1,10 @@
 {% include "base.html" %}
-
-{% block main_content %}
 <content id="main-content" class="main-content">
-
     <form method="post">
         <label>
             <div>Subject</div>
             <input type="text" name="subject" value="{{blog.subject}}">
         </label>
-
         <label>
             <div>Content</div>
             <textarea name="content">{{blog.content}}</textarea>
@@ -17,7 +13,6 @@
         <div>
             <input type="submit" value="Edit">
         </div>
-
     </form>
     <form method="post">
     	<div>
@@ -30,5 +25,4 @@
         </div>
     </form>
 </content>
-{% endblock %}
 {% include "footer.html" %}

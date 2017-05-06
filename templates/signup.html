@@ -1,9 +1,6 @@
 {% include "base.html" %}
-
-{% block main_content %}
 <content id="main-content" class="forms main-content">
     <form method="post">
-
         <label>Username
             <input type="text" name="username">
         </label>
@@ -24,10 +21,7 @@
         {{ emailError }}
         <br>
         {{ verifyError }}
-
         <input type="submit">
     </form>
 </content>
-
-{% endblock %}
 {% include "footer.html" %}
