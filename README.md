@@ -18,3 +18,6 @@
 2. From the blog directory - i.e., where the app.yaml file is located run `dev_appserver.py app.yaml`.
 3. In a browser open to where your local web server is - for example, `localhost:8080`.
 4. Now you should be able to use the site on your local web server.
+
+## Example page on Google App Pages
+[Link to Example](https://turing-outrider-161118.appspot.com)
